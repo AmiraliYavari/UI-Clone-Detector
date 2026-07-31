@@ -24,6 +24,12 @@ export const PROVIDERS = {
     baseURL: 'https://api.anthropic.com/v1',
     model: 'claude-sonnet-4-6',
   },
+  gemini: {
+  label: 'Google Gemini',
+  apiKeyEnv: 'GEMINI_API_KEY',
+  baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
+  model: 'gemini-2.0-flash',
+  },
 };
 
 export function availableProviders() {
