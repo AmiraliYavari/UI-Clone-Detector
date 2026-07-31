@@ -2,19 +2,21 @@ import { useParams, Link } from 'react-router-dom';
 import { getById } from '../store';
 import CodeViewer from '../components/CodeViewer';
 import PreviewFrame from '../components/PreviewFrame';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Result() {
   const { id } = useParams();
   const entry = getById(id);
+  const { t } = useLanguage();
 
   if (!entry) {
     return (
       <div className="panel">
         <div className="empty">
-          نتیجه‌ای با این شناسه پیدا نشد.
+          {t('result.notFound')}
           <br />
           <Link to="/" style={{ color: 'var(--green)' }}>
-            برگشت به خانه
+            {t('result.backHome')}
           </Link>
         </div>
       </div>
@@ -25,7 +27,8 @@ export default function Result() {
     <>
       <div className="hero">
         <h1>
-          نتیجه‌ی <span>کلون</span>
+          {t('result.titlePrefix')}
+          <span>{t('result.titleSpan')}</span>
           {entry.provider && (
             <span className="badge" style={{ marginInlineStart: 12, verticalAlign: 'middle' }}>
               {entry.provider}
@@ -38,7 +41,7 @@ export default function Result() {
       <div className="grid">
         <div className="panel">
           <div className="panel-head">
-            <span>اسکرین‌شات ورودی</span>
+            <span>{t('result.inputScreenshot')}</span>
           </div>
           <div style={{ padding: 16 }}>
             <img
@@ -51,14 +54,14 @@ export default function Result() {
 
         <div className="panel">
           <div className="panel-head">
-            <span>خروجی — کد</span>
+            <span>{t('result.outputCode')}</span>
           </div>
           <CodeViewer jsx={entry.jsx} css={entry.css} />
         </div>
 
         <div className="panel previewwrap">
           <div className="panel-head">
-            <span>پیش‌نمایش زنده</span>
+            <span>{t('result.livePreview')}</span>
           </div>
           <PreviewFrame jsx={entry.jsx} css={entry.css} />
         </div>

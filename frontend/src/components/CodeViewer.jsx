@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function CodeViewer({ jsx, css }) {
   const [tab, setTab] = useState('jsx');
+  const { t } = useLanguage();
 
   const copy = () => {
     navigator.clipboard.writeText(tab === 'jsx' ? jsx : css).catch(() => {});
@@ -20,7 +22,7 @@ export default function CodeViewer({ jsx, css }) {
       <pre className="code">{tab === 'jsx' ? jsx : css}</pre>
       <div className="copybar">
         <button className="copybtn" onClick={copy}>
-          Copy
+          {t('code.copy')}
         </button>
       </div>
     </>

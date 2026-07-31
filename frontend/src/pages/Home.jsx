@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Dropzone from '../components/Dropzone';
 import { analyzeScreenshot, getProviders } from '../api';
 import { saveToHistory } from '../store';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Home() {
   const [imgData, setImgData] = useState(null);
@@ -11,6 +12,7 @@ export default function Home() {
   const [providers, setProviders] = useState([]);
   const [provider, setProvider] = useState(null);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     getProviders().then(({ providers, default: def }) => {
@@ -34,7 +36,7 @@ export default function Home() {
       });
       navigate(`/result/${entry.id}`);
     } catch (err) {
-      setError('تحلیل تصویر با خطا مواجه شد: ' + err.message);
+      setError(t('home.errorPrefix') + err.message);
     } finally {
       setLoading(false);
     }
@@ -66,19 +68,18 @@ export default function Home() {
 
       <div className="hero" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, marginTop: -1 }}>
         <h1>
-          UI <span>Cloner</span> — از عکس تا کد
+          {t('home.titlePrefix')}
+          <span>{t('home.titleSpan')}</span>
+          {t('home.titleSuffix')}
         </h1>
-        <p>
-          یه اسکرین‌شات از رابط کاربری گیت‌هاب (یا هر UI دیگه‌ای) بده، بک‌اند از طریق مدل هوش مصنوعی
-          تحلیلش می‌کنه و کد React معادلش رو تولید می‌کنه — همراه با پیش‌نمایش زنده.
-        </p>
+        <p>{t('home.subtitle')}</p>
       </div>
 
       <div className="grid">
         <div className="panel">
           <div className="panel-head">
-            <span>ورودی — اسکرین‌شات</span>
-            {imgData && <span className="badge">آماده</span>}
+            <span>{t('home.inputPanelTitle')}</span>
+            {imgData && <span className="badge">{t('home.ready')}</span>}
           </div>
           <Dropzone imgData={imgData} onFile={setImgData} />
 
@@ -94,7 +95,7 @@ export default function Home() {
                   letterSpacing: '0.06em',
                 }}
               >
-                مدل تحلیل‌گر
+                {t('home.analyzerModel')}
               </div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {providers.map((p) => (
@@ -118,23 +119,23 @@ export default function Home() {
           )}
           {providers.length === 0 && (
             <div className="status err" style={{ paddingTop: 0 }}>
-              هیچ providerای پیکربندی نشده — یه کلید API در backend/.env قرار بده.
+              {t('home.noProvider')}
             </div>
           )}
 
           <div className="actions">
             <button className="btn primary" disabled={!imgData || loading || !provider} onClick={analyze}>
-              {loading ? 'در حال تحلیل…' : 'تحلیل و تولید کد'}
+              {loading ? t('home.analyzing') : t('home.analyzeBtn')}
             </button>
             {imgData && (
               <button className="btn" disabled={loading} onClick={() => setImgData(null)}>
-                پاک‌کردن
+                {t('home.clearBtn')}
               </button>
             )}
           </div>
           {loading && (
             <div className="status">
-              <div className="spinner"></div> مدل داره ظاهر رابط کاربری رو تحلیل می‌کنه…
+              <div className="spinner"></div> {t('home.loadingStatus')}
             </div>
           )}
           {error && <div className="status err">{error}</div>}
@@ -142,14 +143,14 @@ export default function Home() {
 
         <div className="panel">
           <div className="panel-head">
-            <span>راهنما</span>
+            <span>{t('home.guideTitle')}</span>
           </div>
           <div className="status" style={{ whiteSpace: 'normal', lineHeight: 2, flexDirection: 'column', alignItems: 'flex-start' }}>
-            <p style={{ margin: 0 }}>۱. یه اسکرین‌شات از یه رابط کاربری (مثلاً صفحه‌ی گیت‌هاب) آپلود کن.</p>
-            <p style={{ margin: 0 }}>۲. یه مدل تحلیل‌گر انتخاب کن (OpenAI / Z.AI / Anthropic — هرکدوم که کلیدش رو تنظیم کرده باشی).</p>
-            <p style={{ margin: 0 }}>۳. روی «تحلیل و تولید کد» بزن.</p>
-            <p style={{ margin: 0 }}>۴. کد React و CSS تولیدشده رو ببین، کپی کن یا پیش‌نمایش زنده‌ش رو تماشا کن.</p>
-            <p style={{ margin: 0 }}>۵. نتیجه در تاریخچه ذخیره می‌شه تا بعداً بتونی بهش برگردی.</p>
+            <p style={{ margin: 0 }}>{t('home.guide1')}</p>
+            <p style={{ margin: 0 }}>{t('home.guide2')}</p>
+            <p style={{ margin: 0 }}>{t('home.guide3')}</p>
+            <p style={{ margin: 0 }}>{t('home.guide4')}</p>
+            <p style={{ margin: 0 }}>{t('home.guide5')}</p>
           </div>
         </div>
       </div>

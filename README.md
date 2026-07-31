@@ -1,84 +1,95 @@
+<div align="right">
+
+**🌐 [فارسی](./README.fa.md) | English**
+
+</div>
+
 <div align="center">
 
 # 🧬 UI Cloner
 
-### از عکس تا کد — در چند ثانیه
+### From Screenshot to Code — in seconds
 
-یه اسکرین‌شات از هر رابط کاربری بده (مثلاً گیت‌هاب)، هوش مصنوعی تحلیلش می‌کنه و کد **React** واقعیش رو با **پیش‌نمایش زنده** تحویلت می‌ده.
+Upload a screenshot of any UI (like GitHub), and the AI analyzes it and hands you back real **React** code with a **live preview**.
 
 [![Node](https://img.shields.io/badge/Node-18%2B-3fb950?style=flat-square&logo=node.js&logoColor=white)](#)
 [![React](https://img.shields.io/badge/React-18-58a6ff?style=flat-square&logo=react&logoColor=white)](#)
 [![Vite](https://img.shields.io/badge/Vite-5-d29922?style=flat-square&logo=vite&logoColor=white)](#)
 [![Express](https://img.shields.io/badge/Express-4-8b949e?style=flat-square&logo=express&logoColor=white)](#)
-[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o-f85149?style=flat-square&logo=openai&logoColor=white)](#)
+[![Multi--Provider](https://img.shields.io/badge/AI-OpenAI%20%7C%20Z.AI%20%7C%20Anthropic-f85149?style=flat-square)](#)
 [![License](https://img.shields.io/badge/license-MIT-30363d?style=flat-square)](#)
 
 </div>
 
 ---
 
-## ✨ ویژگی‌ها
+## ✨ Features
 
 | | |
 |---|---|
-| 📸 **آپلود با Drag & Drop** | عکس رو بکش و رها کن، همین |
-| 🧠 **تحلیل با GPT-4o Vision** | رنگ‌ها، فاصله‌ها، تایپوگرافی و ساختار لایه رو تشخیص می‌ده |
-| ⚛️ **خروجی React واقعی** | نه توضیح، نه نیمه‌کاره — کد کامل JSX + CSS |
-| 👁️ **پیش‌نمایش زنده** | همون لحظه کد تولیدشده رو اجرا و رندر می‌کنه |
-| 🕘 **تاریخچه** | همه‌ی کلون‌های قبلی‌ت لوکال ذخیره می‌شن |
-| 🔒 **کلید API امن** | فقط روی بک‌اند، هیچ‌وقت توی مرورگر لو نمی‌ره |
+| 📸 **Drag & Drop Upload** | Just drag your screenshot in |
+| 🧠 **Multi-provider AI analysis** | Switch between OpenAI, Z.AI, or Anthropic — whichever key you have |
+| ⚛️ **Real React output** | Not a description — full working JSX + CSS |
+| 👁️ **Live preview** | Renders the generated code instantly |
+| 🕘 **History** | Every past clone saved locally |
+| 🌐 **Bilingual UI** | English / Persian, switchable in the navbar |
+| 🔒 **API keys stay server-side** | Never exposed to the browser |
 
 ---
 
-## 🏗️ معماری
+## 🏗️ Architecture
 
 ```
-┌─────────────┐         base64 image          ┌──────────────┐        vision + json         ┌───────────┐
-│  Frontend   │ ─────────────────────────────► │   Backend    │ ────────────────────────────► │  OpenAI   │
-│ React + Vite│                                 │Express + SDK │                                │  GPT-4o   │
-│             │ ◄───────────────────────────── │              │ ◄──────────────────────────── │           │
-└─────────────┘        { analysis, jsx, css }   └──────────────┘        structured JSON         └───────────┘
+┌─────────────┐         base64 image          ┌──────────────┐        vision + json         ┌─────────────────────┐
+│  Frontend   │ ─────────────────────────────► │   Backend    │ ────────────────────────────► │  OpenAI / Z.AI /     │
+│ React + Vite│                                 │Express + SDK │                                │  Anthropic (vision)  │
+│             │ ◄───────────────────────────── │              │ ◄──────────────────────────── │                       │
+└─────────────┘        { analysis, jsx, css }   └──────────────┘        structured JSON         └─────────────────────┘
 ```
 
 ```
 github-ui-cloner/
-├── backend/                 # 🔧 Express server — پراکسی امن به OpenAI
-│   ├── server.js            #    POST /api/analyze
+├── backend/                 # 🔧 Express server — secure proxy to the AI provider
+│   ├── server.js            #    POST /api/analyze · GET /api/providers
+│   ├── providers.js         #    OpenAI / Z.AI / Anthropic config
 │   └── .env.example
 │
 └── frontend/                # 🎨 React + Vite + React Router
     └── src/
         ├── pages/
-        │   ├── Home.jsx      # آپلود و شروع تحلیل
-        │   ├── Result.jsx    # کد + پیش‌نمایش زنده
-        │   └── History.jsx   # تاریخچه‌ی کلون‌ها
+        │   ├── Home.jsx      # Upload + analyze
+        │   ├── Result.jsx    # Code + live preview
+        │   └── History.jsx   # Past clones
         ├── components/
         │   ├── Dropzone.jsx
         │   ├── CodeViewer.jsx
-        │   └── PreviewFrame.jsx
+        │   ├── PreviewFrame.jsx
+        │   └── Navbar.jsx     # nav + language switch + backend status
+        ├── i18n/translations.js
+        ├── context/LanguageContext.jsx
         └── api.js
 ```
 
 ---
 
-## 🚀 شروع سریع
+## 🚀 Quick Start
 
-### پیش‌نیاز
-- Node.js نسخه‌ی ۱۸ یا بالاتر
-- یه [کلید OpenAI API](https://platform.openai.com/api-keys)
+### Prerequisites
+- Node.js 18+
+- An API key for at least one provider: [OpenAI](https://platform.openai.com/api-keys), [Z.AI](https://z.ai/model-api), or [Anthropic](https://console.anthropic.com/)
 
-### ۱) بک‌اند رو بالا بیار
+### 1) Start the backend
 
 ```bash
 cd backend
 npm install
-cp .env.example .env      # کلید OPENAI_API_KEY رو داخلش بذار
+cp .env.example .env      # add whichever provider key(s) you have
 npm run dev
 ```
 
-> 🟢 سرور روی `http://localhost:8787` گوش می‌ده
+> 🟢 Server listens on `http://localhost:8787`
 
-### ۲) فرانت‌اند رو بالا بیار
+### 2) Start the frontend
 
 ```bash
 cd frontend
@@ -87,53 +98,65 @@ cp .env.example .env
 npm run dev
 ```
 
-> 🟢 اپ روی `http://localhost:5173` در دسترسه
+> 🟢 App available at `http://localhost:5173`
 
-### ۳) امتحانش کن
-یه اسکرین‌شات از یه صفحه‌ی گیت‌هاب بگیر، توی صفحه‌ی خانه رهاش کن، دکمه‌ی «تحلیل و تولید کد» رو بزن و چند ثانیه بعد کد + پیش‌نمایش زنده‌ش رو ببین. 🎉
+### 3) Try it out
+Drop a screenshot of a GitHub page onto the home page, hit **Analyze & Generate Code**, and a few seconds later you'll have working React code and a live preview. 🎉
 
 ---
 
-## 🔄 جریان کار
+## 🔄 How it works
 
 ```mermaid
 sequenceDiagram
-    participant U as کاربر
+    participant U as User
     participant F as Frontend
     participant B as Backend
-    participant AI as OpenAI GPT-4o
+    participant AI as AI Provider
 
-    U->>F: آپلود اسکرین‌شات
-    F->>B: POST /api/analyze (base64)
-    B->>AI: تصویر + پرامپت ساختاریافته
+    U->>F: Upload screenshot
+    F->>B: POST /api/analyze (base64 + provider)
+    B->>AI: Image + structured prompt
     AI-->>B: { analysis, jsx, css }
-    B-->>F: JSON پاسخ
-    F->>F: ذخیره در localStorage
-    F-->>U: نمایش کد + پیش‌نمایش زنده
+    B-->>F: JSON response
+    F->>F: Save to localStorage
+    F-->>U: Show code + live preview
 ```
 
 ---
 
-## 🛠️ استک فنی
+## 🌍 Supported AI Providers
 
-- **Frontend:** React 18 · React Router 6 · Vite 5
-- **Backend:** Express 4 · OpenAI SDK
-- **مدل هوش مصنوعی:** `gpt-4o` (vision + `response_format: json_object`)
-- **پیش‌نمایش زنده:** Babel Standalone داخل `iframe` سندباکس‌شده
+| Provider | Env var | Default model |
+|---|---|---|
+| OpenAI | `OPENAI_API_KEY` | `gpt-4o` |
+| Z.AI | `ZAI_API_KEY` | `glm-4.6v` |
+| Anthropic | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` |
+
+You only need to configure the ones you plan to use — the app auto-detects available providers and lets you pick one in the UI.
 
 ---
 
-## ⚠️ نکات مهم قبل از Production
+## 🛠️ Tech Stack
 
-- [ ] نتایج رو به‌جای `localStorage` توی یه دیتابیس واقعی (Postgres / SQLite) ذخیره کن
-- [ ] Rate limiting و احراز هویت اضافه کن — هر تحلیل هزینه‌ی API داره
-- [ ] برای پاسخ‌های نامعتبر JSON از مدل، retry logic بذار
-- [ ] `.env` واقعی رو هیچ‌وقت commit نکن (توی `.gitignore` پوشش داده شده)
+- **Frontend:** React 18 · React Router 6 · Vite 5
+- **Backend:** Express 4 · OpenAI-compatible SDK (works across all 3 providers)
+- **Live preview:** Babel Standalone inside a sandboxed `iframe`
+- **i18n:** Custom lightweight context-based translation, EN default / FA toggle
+
+---
+
+## ⚠️ Before going to production
+
+- [ ] Persist results in a real database (Postgres / SQLite) instead of `localStorage`
+- [ ] Add rate limiting and authentication — every analysis costs API credits
+- [ ] Add retry logic for invalid JSON responses from the model
+- [ ] Never commit your real `.env` (already covered by `.gitignore`)
 
 ---
 
 <div align="center">
 
-ساخته‌شده با ❤️ و کلی فنجون قهوه ☕
+Built with ❤️ and a lot of coffee ☕
 
 </div>

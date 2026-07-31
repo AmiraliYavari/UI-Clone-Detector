@@ -1,8 +1,10 @@
 import { useRef, useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Dropzone({ imgData, onFile }) {
   const [dragging, setDragging] = useState(false);
   const inputRef = useRef(null);
+  const { t } = useLanguage();
 
   const handleFile = (file) => {
     if (!file || !file.type.startsWith('image/')) return;
@@ -40,8 +42,8 @@ export default function Dropzone({ imgData, onFile }) {
               <circle cx="8.5" cy="8.5" r="1.5" />
               <path d="M21 15l-5-5L5 21" />
             </svg>
-            <div className="t1">عکس رو بکش اینجا یا کلیک کن</div>
-            <div className="t2">PNG / JPG</div>
+            <div className="t1">{t('dropzone.dragText')}</div>
+            <div className="t2">{t('dropzone.fileTypes')}</div>
           </>
         )}
       </div>

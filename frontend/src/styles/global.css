@@ -48,6 +48,19 @@ a{color:inherit; text-decoration:none;}
 .navbar .status .led.on{background:var(--green); box-shadow:0 0 6px var(--green);}
 .navbar .status .led.off{background:var(--red);}
 
+.lang-switch{
+  display:flex; border:1px solid var(--border); border-radius:6px; overflow:hidden;
+  font-family:var(--mono);
+}
+.lang-switch button{
+  background:transparent; border:none; color:var(--text-dim);
+  font-family:var(--mono); font-size:11.5px; font-weight:600;
+  padding:6px 10px; cursor:pointer; transition:.15s;
+}
+.lang-switch button:first-child{border-inline-end:1px solid var(--border);}
+.lang-switch button.active{background:var(--green); color:#04170a;}
+.lang-switch button:not(.active):hover{color:var(--text); background:#21262d;}
+
 /* hero */
 .hero{
   border:1px solid var(--border);
