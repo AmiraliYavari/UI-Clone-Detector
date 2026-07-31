@@ -26,6 +26,11 @@ export default function Result() {
       <div className="hero">
         <h1>
           نتیجه‌ی <span>کلون</span>
+          {entry.provider && (
+            <span className="badge" style={{ marginInlineStart: 12, verticalAlign: 'middle' }}>
+              {entry.provider}
+            </span>
+          )}
         </h1>
         <p>{entry.analysis}</p>
       </div>

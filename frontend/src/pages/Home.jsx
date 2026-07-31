@@ -1,26 +1,36 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Dropzone from '../components/Dropzone';
-import { analyzeScreenshot } from '../api';
+import { analyzeScreenshot, getProviders } from '../api';
 import { saveToHistory } from '../store';
 
 export default function Home() {
   const [imgData, setImgData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [providers, setProviders] = useState([]);
+  const [provider, setProvider] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    getProviders().then(({ providers, default: def }) => {
+      setProviders(providers);
+      setProvider(def || providers[0]?.id || null);
+    });
+  }, []);
 
   const analyze = async () => {
     if (!imgData) return;
     setLoading(true);
     setError(null);
     try {
-      const result = await analyzeScreenshot(imgData);
+      const result = await analyzeScreenshot({ ...imgData, provider });
       const entry = saveToHistory({
         previewUrl: imgData.previewUrl,
         analysis: result.analysis,
         jsx: result.jsx,
         css: result.css,
+        provider: result.provider,
       });
       navigate(`/result/${entry.id}`);
     } catch (err) {
@@ -71,8 +81,49 @@ export default function Home() {
             {imgData && <span className="badge">آماده</span>}
           </div>
           <Dropzone imgData={imgData} onFile={setImgData} />
+
+          {providers.length > 0 && (
+            <div style={{ padding: '0 16px 12px' }}>
+              <div
+                style={{
+                  fontFamily: 'var(--mono)',
+                  fontSize: 11.5,
+                  color: 'var(--text-dim)',
+                  marginBottom: 6,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                }}
+              >
+                مدل تحلیل‌گر
+              </div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {providers.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => setProvider(p.id)}
+                    className="btn"
+                    style={{
+                      fontSize: 12.5,
+                      padding: '7px 12px',
+                      background: provider === p.id ? 'var(--green)' : '#21262d',
+                      color: provider === p.id ? '#04170a' : 'var(--text)',
+                      borderColor: provider === p.id ? 'var(--green)' : 'var(--border)',
+                    }}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {providers.length === 0 && (
+            <div className="status err" style={{ paddingTop: 0 }}>
+              هیچ providerای پیکربندی نشده — یه کلید API در backend/.env قرار بده.
+            </div>
+          )}
+
           <div className="actions">
-            <button className="btn primary" disabled={!imgData || loading} onClick={analyze}>
+            <button className="btn primary" disabled={!imgData || loading || !provider} onClick={analyze}>
               {loading ? 'در حال تحلیل…' : 'تحلیل و تولید کد'}
             </button>
             {imgData && (
@@ -95,9 +146,10 @@ export default function Home() {
           </div>
           <div className="status" style={{ whiteSpace: 'normal', lineHeight: 2, flexDirection: 'column', alignItems: 'flex-start' }}>
             <p style={{ margin: 0 }}>۱. یه اسکرین‌شات از یه رابط کاربری (مثلاً صفحه‌ی گیت‌هاب) آپلود کن.</p>
-            <p style={{ margin: 0 }}>۲. روی «تحلیل و تولید کد» بزن.</p>
-            <p style={{ margin: 0 }}>۳. کد React و CSS تولیدشده رو ببین، کپی کن یا پیش‌نمایش زنده‌ش رو تماشا کن.</p>
-            <p style={{ margin: 0 }}>۴. نتیجه در تاریخچه ذخیره می‌شه تا بعداً بتونی بهش برگردی.</p>
+            <p style={{ margin: 0 }}>۲. یه مدل تحلیل‌گر انتخاب کن (OpenAI / Z.AI / Anthropic — هرکدوم که کلیدش رو تنظیم کرده باشی).</p>
+            <p style={{ margin: 0 }}>۳. روی «تحلیل و تولید کد» بزن.</p>
+            <p style={{ margin: 0 }}>۴. کد React و CSS تولیدشده رو ببین، کپی کن یا پیش‌نمایش زنده‌ش رو تماشا کن.</p>
+            <p style={{ margin: 0 }}>۵. نتیجه در تاریخچه ذخیره می‌شه تا بعداً بتونی بهش برگردی.</p>
           </div>
         </div>
       </div>

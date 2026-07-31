@@ -1,20 +1,22 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import OpenAI from 'openai';
+import { availableProviders, getClient, PROVIDERS } from './providers.js';
 
 const app = express();
 const PORT = process.env.PORT || 8787;
 const ORIGINS = (process.env.CLIENT_ORIGIN || 'http://localhost:5173').split(',');
+const DEFAULT_PROVIDER = process.env.DEFAULT_PROVIDER || 'openai';
 
 app.use(cors({ origin: ORIGINS }));
 app.use(express.json({ limit: '15mb' })); // screenshots as base64 can be a few MB
 
-if (!process.env.OPENAI_API_KEY) {
-  console.warn('[warn] OPENAI_API_KEY is not set. Copy .env.example to .env and add your key.');
+const configured = availableProviders();
+if (configured.length === 0) {
+  console.warn('[warn] No provider API keys are set. Copy .env.example to .env and add at least one key.');
+} else {
+  console.log('[info] Available providers:', configured.map((p) => p.id).join(', '));
 }
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const SYSTEM_PROMPT = `You are an expert frontend engineer specialized in pixel-accurate UI cloning.
 You will be given a screenshot of a UI (often GitHub-style).
@@ -29,15 +31,23 @@ Respond ONLY with a raw JSON object (no markdown fences, no prose before or afte
 }
 The jsx field must NOT include a <style> tag. Keep class names in jsx consistent with selectors in css. Ensure jsx is valid and compiles with Babel standalone.`;
 
+// Lets the frontend build a provider picker, showing only providers that actually have a key configured
+app.get('/api/providers', (_req, res) => {
+  res.json({ providers: availableProviders(), default: DEFAULT_PROVIDER });
+});
+
 app.post('/api/analyze', async (req, res) => {
   try {
-    const { imageBase64, mediaType } = req.body || {};
+    const { imageBase64, mediaType, provider } = req.body || {};
     if (!imageBase64 || !mediaType) {
       return res.status(400).json({ error: 'imageBase64 and mediaType are required' });
     }
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
+    const providerId = provider && PROVIDERS[provider] ? provider : DEFAULT_PROVIDER;
+    const { client, model, label } = getClient(providerId);
+
+    const completion = await client.chat.completions.create({
+      model,
       max_tokens: 8000,
       response_format: { type: 'json_object' },
       messages: [
@@ -59,16 +69,16 @@ app.post('/api/analyze', async (req, res) => {
     });
 
     const raw = completion.choices[0]?.message?.content;
-    if (!raw) throw new Error('No text response from model');
+    if (!raw) throw new Error(`No text response from ${label}`);
 
     let parsed;
     try {
       parsed = JSON.parse(raw);
     } catch (e) {
-      throw new Error('Model did not return valid JSON');
+      throw new Error(`${label} did not return valid JSON`);
     }
 
-    res.json(parsed);
+    res.json({ ...parsed, provider: providerId });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message || 'Internal server error' });
